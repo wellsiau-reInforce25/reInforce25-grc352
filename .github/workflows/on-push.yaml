@@ -127,5 +127,51 @@ jobs:
       #########################################
 
 ###### PLACEHOLDER FOR SUMMARY STEP ######
+  summary-report:
+    name: 'Summary Report'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # for actions/checkout to fetch code
+    needs: [tf-format-and-lint, tf-static-checks, cfn-format-and-lint, cfn-static-checks]
+    if: always()
+    steps:
+      - name: Create Summary Table
+        uses: actions/github-script@v6
+        if: always()
+        env:
+          TF_LINT_STATUS: ${{ needs.tf-format-and-lint.outputs.tflint_status }}
+          TF_STATIC_STATUS: ${{ needs.tf-static-checks.outputs.checkov_status }}
+          CFN_LINT_STATUS: ${{ needs.cfn-format-and-lint.outputs.cfnlint_status }}
+          CFN_STATIC_STATUS: ${{ needs.cfn-static-checks.outputs.checkov_status }}
+        with:
+          script: |
+            // Create a status emoji based on the outcome
+            const getStatusEmoji = (status) => {
+              if (!status) return '❓';
+              switch(status.toLowerCase()) {
+                case 'success': return '✅';
+                case 'failure': return '❌';
+                case 'cancelled': return '⚠️';
+                case 'skipped': return '⏭️';
+                default: return '❓';
+              }
+            };
 
+            // Create a summary table
+            const summary = `## Commit Push Workflow Summary
+
+            | Check | Status | Details |
+            | ----- | ------ | ------- |
+            | TF Lint | ${getStatusEmoji(process.env.TF_LINT_STATUS)} | ${process.env.TF_LINT_STATUS || 'N/A'} |
+            | TF Static Analysis | ${getStatusEmoji(process.env.TF_STATIC_STATUS)} | ${process.env.TF_STATIC_STATUS || 'N/A'} |
+            | CFN Lint | ${getStatusEmoji(process.env.CFN_LINT_STATUS)} | ${process.env.CFN_LINT_STATUS || 'N/A'} |
+            | CFN Static Analysis | ${getStatusEmoji(process.env.CFN_STATIC_STATUS)} | ${process.env.CFN_STATIC_STATUS || 'N/A'} |
+
+            *Generated at: ${new Date().toISOString()}*
+            `;
+
+            // Write to the job summary
+            await core.summary
+              .addRaw(summary)
+              .write();
 ##########################################
