@@ -3,7 +3,16 @@ fail_fast: true
 minimum_pre_commit_version: "2.6.0"
 repos:
 ###### PLACEHOLDER FOR TERRAFORM LINTING ######
-
+## Terraform Linting
+- repo: https://github.com/antonbabenko/pre-commit-terraform
+  rev: 521ada54e82bdee23c6a1f42a83cd22898f1efd4 #v1.99.0
+  hooks:
+    - id: terraform_fmt
+      args:
+        - --args=--recursive
+    - id: terraform_tflint
+      args:
+        - --args=--config=__GIT_WORKING_DIR__/.config/tf-lint/.tflint.hcl
 ###############################################
 
 ###### PLACEHOLDER FOR CFN LINTING       ######
