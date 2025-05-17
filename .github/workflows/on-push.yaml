@@ -54,7 +54,25 @@ jobs:
       - uses: actions/checkout@v4
 
       ###### PLACEHOLDER FOR CHECKOV TF ######
+      - name: Checkov HCL Scan
+        id: checkov-run
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          config_file: .config/checkov/.checkov.yaml
+          output_format: cli
+          output_file_path: console
+          framework: terraform
+          directory: ./terraform
 
+      - name: Checkov Report
+        id: checkov-report
+        working-directory: ./terraform
+        if: always()
+        env:
+          CHECKOV_STATUS: "${{ steps.checkov-run.outcome }}"
+        run: |
+          echo "Checkov scan status: $CHECKOV_STATUS" >> $GITHUB_STEP_SUMMARY
+          echo "$CHECKOV_RESULTS" >> $GITHUB_STEP_SUMMARY
       ########################################
 
   cfn-format-and-lint:
