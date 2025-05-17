@@ -14,7 +14,34 @@ jobs:
       - uses: actions/checkout@v4
 
       ###### PLACEHOLDER FOR TF LINTING ######
+      - name: Cache plugin dir
+        uses: actions/cache@v4
+        with:
+          path: ~/.tflint.d/plugins
+          key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.11.2"
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.52.0
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Init TFLint
+        id: tf-lint-init
+        run: tflint --init --config=.config/tf-lint/.tflint.hcl
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Run TFLint
+        id: tf-lint-run
+        run: tflint --config=.config/tf-lint/.tflint.hcl
       ########################################
 
   tf-static-checks:
