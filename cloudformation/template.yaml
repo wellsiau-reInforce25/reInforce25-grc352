@@ -1,3 +1,16 @@
 ###### PLACEHOLDER FOR CLOUDFORMATION TEMPLATE ######
-
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  ScanOnPush:
+    Default: "true"
+    Type: String
+Resources:
+  MyRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: "test-repo-cfn"
+      ImageTagMutability: "IMMUTABLE"
+      ImageScanningConfiguration:
+        ScanOnPush:
+          Ref: ScanOnPush
 #####################################################

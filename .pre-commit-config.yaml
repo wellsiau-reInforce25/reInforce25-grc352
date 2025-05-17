@@ -16,7 +16,12 @@ repos:
 ###############################################
 
 ###### PLACEHOLDER FOR CFN LINTING       ######
-
+## CloudFormation Linting
+- repo: https://github.com/aws-cloudformation/cfn-lint
+  rev: v1.34.2 # The version of cfn-lint to use
+  hooks:
+    - id: cfn-lint
+      files: cloudformation/.*\.(json|yml|yaml)$
 ###############################################
 
 ###### PLACEHOLDER FOR CHECKOV CHECKS    ######
