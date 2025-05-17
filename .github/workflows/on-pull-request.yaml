@@ -27,7 +27,68 @@ jobs:
         uses: actions/checkout@v4
 
       ###### PLACEHOLDER FOR TERRAFORM PLAN   ######
+      - name: Configure AWS Credentials
+        id: configure-aws-credentials
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_ROLE_TO_ASSUME }}
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.11.2"
+
+      - name: Generate Terraform Plan
+        id: plan
+        working-directory: ./terraform
+        run: |
+          # Fetch AWS Account ID
+          ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
+          # Configure Terraform backend
+          REPO_OWNER=${GITHUB_REPOSITORY_OWNER}
+          REPO_NAME=${GITHUB_REPOSITORY##*/}
+          # Get parameters
+          echo "Get *.tfvars from SSM parameter"
+          aws ssm get-parameter \
+            --name "/reinforce25/grc352/terraform/tfvars" \
+            --query "Parameter.Value" \
+            --output "text" \
+            --region $AWS_REGION >> terraform.tfvars
+          # Run Terraform
+          terraform init -backend-config="bucket=$ACCOUNT_ID-grc352-tf-state" -backend-config="key=state/$ACCOUNT_ID/$REPO_OWNER/$REPO_NAME/terraform.tfstate" -backend-config="region=$AWS_REGION" -backend-config="encrypt=true" -backend-config="use_lockfile=true"
+          terraform plan -var-file="terraform.tfvars" -no-color -out=tfplan
+          terraform show -json tfplan > tfplan.json
+
+      - name: Run Checkov (TF Plan)
+        id: checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          config_file: .config/checkov/.checkov.yaml
+          file: ./terraform/tfplan.json
+          repo_root_for_plan_enrichment: ./terraform
+          output_format: cli
+          output_file_path: console
+          # soft_fail: true
+
+      - name: Checkov Report
+        id: checkov-report
+        working-directory: ./terraform
+        if: always()
+        env:
+          CHECKOV_STATUS: "${{ steps.checkov.outcome }}"
+        run: |
+          echo "Checkov scan status: $CHECKOV_STATUS" >> $GITHUB_STEP_SUMMARY
+          echo "$CHECKOV_RESULTS" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: |
+            ./terraform/tfplan
+            ./terraform/tfplan.json
       ##############################################
 
   cfn-analysis:
