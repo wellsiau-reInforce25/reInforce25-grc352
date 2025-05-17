@@ -25,7 +25,13 @@ repos:
 ###############################################
 
 ###### PLACEHOLDER FOR CHECKOV CHECKS    ######
-
+## Checkov checks
+- repo: https://github.com/bridgecrewio/checkov.git
+  rev: 112ff682598c6a7121665f38eee31c872df66bf2 # v3.2.408
+  hooks:
+    - id: checkov
+      entry: checkov -d . --config-file .config/checkov/.checkov.yaml --framework terraform,cloudformation
+    - id: checkov_secrets
 ###############################################
 
 ###### PLACEHOLDER FOR CFN GUARD CHECKS  ######
