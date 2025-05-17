@@ -1,0 +1,25 @@
+---
+fail_fast: true
+minimum_pre_commit_version: "2.6.0"
+repos:
+###### PLACEHOLDER FOR TERRAFORM LINTING ######
+
+###############################################
+
+###### PLACEHOLDER FOR CFN LINTING       ######
+
+###############################################
+
+###### PLACEHOLDER FOR CHECKOV CHECKS    ######
+
+###############################################
+
+###### PLACEHOLDER FOR CFN GUARD CHECKS  ######
+
+###############################################
+
+## General linting
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: cef0300fd0fc4d2a87a85fa2093c6b283ea36f4b #v5.0.0
+  hooks:
+  - id: trailing-whitespace

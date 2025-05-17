@@ -1,0 +1,52 @@
+name: 'PR - Checks'
+
+on:
+  pull_request:
+    branches: [ main ]
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+  AWS_ROLE_TO_ASSUME: ${{ vars.AWS_ROLE_TO_ASSUME }}
+
+jobs:
+  tf-plan-analysis:
+    name: 'Terraform Plan Analysis'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      id-token: write
+      pull-requests: write # for git bot comment
+    outputs:
+      tfplan: ${{ steps.plan.outputs.tfplan }}
+      checkov_status: ${{ steps.checkov.outcome }}
+      plan_status: ${{ steps.plan.outcome }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      ###### PLACEHOLDER FOR TERRAFORM PLAN   ######
+
+      ##############################################
+
+  cfn-analysis:
+    name: 'CloudFormation Analysis'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      pull-requests: write # for git bot comment access
+    outputs:
+      cfn_guard_status: ${{ steps.cfn-guard.outcome }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      ###### PLACEHOLDER FOR CFN GUARD ######
+
+      #######################################
+
+
+###### PLACEHOLDER FOR SUMMARY #######
+
+######################################

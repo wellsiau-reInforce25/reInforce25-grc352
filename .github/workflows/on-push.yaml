@@ -1,0 +1,60 @@
+name: 'Push / Commit - Checks'
+
+on:
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  tf-format-and-lint:
+    name: 'Terraform Format and linting'
+    runs-on: ubuntu-latest
+    outputs:
+      tflint_status: ${{ steps.tf-lint-run.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+
+      ###### PLACEHOLDER FOR TF LINTING ######
+
+      ########################################
+
+  tf-static-checks:
+    name: 'Terraform Static Checks'
+    runs-on: ubuntu-latest
+    needs: [tf-format-and-lint]
+    outputs:
+      checkov_status: ${{ steps.checkov-run.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+
+      ###### PLACEHOLDER FOR CHECKOV TF ######
+
+      ########################################
+
+  cfn-format-and-lint:
+    name: 'CloudFormation Format and linting'
+    runs-on: ubuntu-latest
+    outputs:
+      cfnlint_status: ${{ steps.cfn-lint-run.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+
+      ###### PLACEHOLDER FOR CFN LINTING ######
+
+      #########################################
+
+  cfn-static-checks:
+    name: 'CloudFormation Static Checks'
+    runs-on: ubuntu-latest
+    needs: [cfn-format-and-lint]
+    outputs:
+      checkov_status: ${{ steps.checkov-run.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+
+      ###### PLACEHOLDER FOR CHECKOV CFN ######
+
+      #########################################
+
+###### PLACEHOLDER FOR SUMMARY STEP ######
+
+##########################################
