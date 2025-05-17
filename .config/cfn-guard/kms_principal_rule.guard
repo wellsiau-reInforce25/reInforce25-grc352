@@ -2,5 +2,46 @@
 # This rule ensures that KMS keys have a policy statement that includes ecr.amazonaws.com as a service principal
 
 ###### PLACEHOLDER FOR CFN GUARD RULE    ######
+# Rule to check if KMS key policies allow ECR service
+# This rule ensures that KMS keys have a policy statement that includes ecr.amazonaws.com as a service principal
 
+# Find all KMS key resources
+let kms_keys = Resources.*[ Type == 'AWS::KMS::Key' ]
+
+# Rule to check if KMS keys have at least one statement with ecr.amazonaws.com as a service principal
+rule kms_key_has_ecr_service when %kms_keys !empty {
+    some %kms_keys.Properties.KeyPolicy.Statement[
+        Principal exists
+        Principal.Service exists
+    ] {
+        Principal.Service == "ecr.amazonaws.com"
+        Action exists
+
+        Action == [
+            "kms:Decrypt",
+            "kms:DescribeKey",
+            "kms:Encrypt",
+            "kms:GenerateDataKey",
+            "kms:ReEncrypt*"
+        ] <<
+            Violation: KMS keys must have at least one policy statement that allows the ECR service (ecr.amazonaws.com) with the specified actions.
+            Fix: Add a policy statement with:
+                Principal:
+                Service: 'ecr.amazonaws.com'
+                Action:
+                - 'kms:Decrypt'
+                - 'kms:DescribeKey'
+                - 'kms:Encrypt'
+                - 'kms:GenerateDataKey'
+                - 'kms:ReEncrypt*'
+        >>
+    }
+}
+
+# Skip rules if no KMS keys are found
+rule kms_key_empty when %kms_keys empty {
+    %kms_keys empty <<
+        No KMS keys found in the template.
+    >>
+}
 ###############################################
