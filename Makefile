@@ -15,7 +15,7 @@ install-terraform:
 		echo "Installing Terraform..."; \
 		wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg; \
 		echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $$(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list; \
-		sudo apt-get update && sudo apt-get install -y terraform || { echo "Failed to install Terraform. Please install manually: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli"; exit 1; }; \
+		sudo NEEDRESTART_MODE=a apt-get update && sudo NEEDRESTART_MODE=a apt-get install -y terraform || { echo "Failed to install Terraform. Please install manually: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli"; exit 1; }; \
 	fi
 
 # Install tflint
@@ -36,7 +36,7 @@ install-cfn-lint:
 	@if command -v cfn-lint >/dev/null 2>&1; then \
 		echo "cfn-lint is already installed: $$(cfn-lint --version)"; \
 	else \
-		sudo apt-get update && sudo apt-get install -y python3-pip && \
+		sudo NEEDRESTART_MODE=a apt-get update && sudo NEEDRESTART_MODE=a apt-get install -y python3-pip && \
 		pip3 install cfn-lint==1.6.1 || { echo "Failed to install cfn-lint. Please install manually: pip install cfn-lint"; exit 1; }; \
 	fi
 
@@ -47,7 +47,7 @@ install-cfn-guard:
 		echo "cfn-guard is already installed: $$(cfn-guard --version)"; \
 	else \
 		echo "Installing Rust and Cargo..."; \
-		sudo apt-get update && sudo apt-get install -y curl build-essential && \
+		sudo NEEDRESTART_MODE=a apt-get update && sudo NEEDRESTART_MODE=a apt-get install -y curl build-essential && \
 		curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
 		export PATH="$$HOME/.cargo/bin:$$PATH" && \
 		. "$$HOME/.cargo/env" && \
@@ -61,7 +61,7 @@ install-checkov:
 	@if command -v checkov >/dev/null 2>&1; then \
 		echo "checkov is already installed: $$(checkov --version)"; \
 	else \
-		sudo apt-get update && sudo apt-get install -y python3-pip && \
+		sudo NEEDRESTART_MODE=a apt-get update && sudo NEEDRESTART_MODE=a apt-get install -y python3-pip && \
 		pip3 install checkov==3.2.410 || { echo "Failed to install checkov. Please install manually: pip install checkov"; exit 1; }; \
 	fi
 
@@ -71,7 +71,7 @@ install-pre-commit:
 	@if command -v pre-commit >/dev/null 2>&1; then \
 		echo "pre-commit is already installed: $$(pre-commit --version)"; \
 	else \
-		sudo apt-get update && sudo apt-get install -y python3-pip && \
+		sudo NEEDRESTART_MODE=a apt-get update && sudo NEEDRESTART_MODE=a apt-get install -y python3-pip && \
 		pip3 install pre-commit==4.2.0 || { echo "Failed to install pre-commit. Please install manually: pip install pre-commit"; exit 1; }; \
 	fi
 	@pre-commit install

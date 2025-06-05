@@ -1,6 +1,3 @@
-# Rule to check if KMS key policies allow ECR service
-# This rule ensures that KMS keys have a policy statement that includes ecr.amazonaws.com as a service principal
-
 ###### PLACEHOLDER FOR CFN GUARD RULE    ######
 
 ###############################################
