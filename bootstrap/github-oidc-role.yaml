@@ -18,7 +18,7 @@ Parameters:
     Type: String
 
 Conditions:
-  CreateOIDCProvider: !Equals 
+  CreateOIDCProvider: !Equals
     - !Ref OIDCProviderArn
     - ""
 
